@@ -1,0 +1,297 @@
+{
+	"info": {
+		"_postman_id": "55159175-a776-4285-b56b-1a38fa1f4c1d",
+		"name": "BillPayment",
+		"description": "### **Project Description: Wallet and Airtime Purchase API**\n\n#### **Overview**\n\nThis project is a simple RESTful API built with Laravel to simulate a bill payment system, focusing on **airtime purchase** and a **wallet system**. The primary objective is to implement a secure and concurrency-safe wallet system, ensuring consistent and accurate transactions even under high load or concurrent requests.\n\n---\n\n#### **Features**\n\n1. **Wallet Management:**\n    \n    - Users can:\n        \n        - Check wallet balance.\n            \n        - Fund their wallet.\n            \n        - Use wallet balance for transactions.\n            \n    - The wallet system ensures **atomic updates** and protects against **race conditions** using techniques like optimistic locking and database transactions.\n        \n2. **Airtime Purchase:**\n    \n    - Users can purchase airtime directly from their wallet balance.\n        \n    - Transactions are logged for auditing but do not integrate with external services (simulated service).\n        \n3. **Transaction History:**\n    \n    - Users can view a detailed history of all transactions, including:\n        \n        - Wallet funding.\n            \n        - Airtime purchases.\n            \n    - Each transaction includes details such as amount, status, and timestamps.\n        \n\n---\n\n#### **Security and Concurrency:**\n\n- **Concurrency Handling:**\n    \n    - The wallet system is designed to prevent race conditions using **optimistic locking**.\n        \n    - **Database transactions** ensure that each funding or purchase operation is atomic and isolated.\n        \n- **Validation and Error Handling:**\n    \n    - Comprehensive input validation ensures data integrity (e.g., valid phone numbers, sufficient wallet balance).\n        \n    - Meaningful error messages are returned for all invalid operations.\n        \n- **Authentication:**\n    \n    - The API uses **Bearer token authentication** for all endpoints to ensure only authorized users can access wallet data and perform transactions.\n        \n- **Data Security:**\n    \n    - User data, including wallet balance and transaction history, is protected using secure database practices and encrypted tokens.\n        \n\n# **Project Modules**\n\n### **Authentication Module: Register, Login, and Logout**\n\nThis module handles user authentication for the Wallet and Airtime Purchase API. It ensures secure access to wallet operations and transactions by requiring users to register, log in, and log out.\n\n### **1\\. User Registration**\n\n**Endpoint:** `POST /auth/register`  \n**Description:** Allows a new user to create an account by providing their details.\n\n### **2\\. User Login**\n\n**Endpoint:** `POST /auth/login`  \n**Description:** Authenticates a user and returns an access token for further requests.\n\n### **3\\. User Logout**\n\n**Endpoint:** `POST /auth/logout`  \n**Description:** Logs out the user by invalidating their access token.\n\n### **Authentication Flow:**\n\n1. **Register:** Users create an account and receive an access token on successful registration.\n    \n2. **Login:** Users log in with their credentials and receive a token for authentication.\n    \n3. **Authenticated Requests:** The token is required for accessing wallet and transaction-related endpoints.\n    \n4. **Logout:** Users can log out, which invalidates their token and ends their session.\n    \n\n### **Wallet Module: Fund Wallet and Check Wallet Balance**\n\nThe Wallet Module manages user funds and provides access to wallet-related operations. It ensures secure handling of wallet transactions, including funding and balance retrieval, with safeguards against concurrency issues.\n\n### **1\\. Check Wallet Balance**\n\n**Endpoint:** `GET /wallet/balance`  \n**Description:** Retrieves the current balance of the user's wallet.  \n**Authorization:** Requires a valid Bearer token.\n\n### **2\\. Fund Wallet**\n\n**Endpoint:** `POST /wallet/fund`  \n**Description:** Adds a specified amount to the user's wallet balance.  \n**Authorization:** Requires a valid Bearer token.\n\n#### **Business Rules:**\n\n- The minimum funding amount should be enforced.\n    \n- Transactions should be atomic to prevent race conditions.\n    \n- A transaction record should be created after a successful wallet funding.\n    \n\n### **Purchase Module: Purchase Airtime**\n\nThe Purchase Module handles airtime transactions, allowing users to buy airtime using their wallet balance. This operation is atomic and secured against concurrency issues to maintain wallet integrity and accuracy.\n\n#### **Business Rules:**\n\n- The user must have sufficient funds in their wallet.\n    \n- A transaction record should be created for each purchase.\n    \n\n### **Transactions Module: Get Transaction History**\n\nThe Transactions Module allows users to view their transaction history, including wallet funding and airtime purchases. It provides a clear audit trail of all wallet-related activities.\n\n### **Get Transaction History**\n\n**Endpoint:** `GET /transactions`  \n**Description:** Retrieves a paginated list of all transactions for the authenticated user, including wallet funding and airtime purchases.  \n**Authorization:** Requires a valid Bearer token.\n\n### **Network Provider Module: Get List of Providers**\n\nThe Network Provider Module allows users to retrieve a list of available network providers, which can be used for airtime purchase or other related services. This endpoint helps users identify which providers are available for their transaction.\n\n### **Get Network Providers List**\n\n**Endpoint:** `GET /providers`  \n**Description:** Retrieves a list of all available network providers. This could be a list of mobile carriers or any other service providers that are integrated into the system.  \n**Authorization:** No authentication is required for this endpoint.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3329916",
+		"_collection_link": "https://blue-firefly-638392.postman.co/workspace/My-Local-Work-Space~979f69c7-8753-4af9-9a47-585e61651048/collection/3329916-55159175-a776-4285-b56b-1a38fa1f4c1d?action=share&source=collection_link&creator=3329916"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\":\"Obinna\",\n    \"lastName\": \"Awulonu\",\n    \"phoneNumber\": \"08067690774\",\n    \"email\": \"awulonuobinna@gmail.com\",\n    \"password\": \"password\",\n    \"passwordConfirmation\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/register",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", pm.response.json().data.token);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"awulonuobinna@gmail.com\",\n    \"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/login",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/auth/logout",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Wallet",
+			"item": [
+				{
+					"name": "Fund wallet",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 2000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/wallet/fund",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"wallet",
+								"fund"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Wallet balance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/wallet/balance",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"wallet",
+								"balance"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Purchases",
+			"item": [
+				{
+					"name": "Buy airtime",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 2000,\n    \"phoneNumber\": \"08067680994\",\n    \"providerId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/purchase/airtime",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"purchase",
+								"airtime"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/transactions",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "perPage",
+									"value": "50",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Network Providers",
+			"item": [
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/providers",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"providers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "KU7WUPL1TBkqueDCtzwsVQ2xsUKjS29O9DpS2F2dzPoIpFvwBhpCvCoEYClL5butx6Yja4I9trwZGBf2",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"pm.request.headers.add({key: 'Accept', value: 'application/json' });"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "http://billpayment.test/api/v1",
+			"type": "string"
+		}
+	]
+}
