@@ -29,18 +29,28 @@ class PurchaseAirtimeAction
         $this->user = request()->user();
 
         throw_if(
+            !is_numeric($this->data['amount']),
+            new IncompleteRequestException('Invalid amount provided.')
+        );
+
+        throw_if(
             !$this->wallet = Wallet::where('user_id', $this->user->id)->first(),
             new ModelNotFoundException('User wallet not found.')
         );
 
-        throw_if(
-            $this->wallet->balance < $data['amount'],
-            new IncompleteRequestException('Insufficient funds.')
-        );
-
         $this->setPayload();
 
+        $this->canPurchaseAirtime();
+
+
+
+
+        // Make the call to the 3rd party API to purchase airtime
+        // Check the response from the API, if successful, proceed with the purchase else
+        // If the request fails, then record the transaction and throw an exception
+
         try {
+            // If a successful purchase, then proceed
             DB::transaction(function () {
                 $this->data['status'] = Status::SUCCESSFUL;
                 $this->updateWallet();
@@ -49,7 +59,7 @@ class PurchaseAirtimeAction
         } catch (Exception $e) {
             $this->data['status'] = Status::FAILED;
 
-            // Record the transaction history after failed creation
+            // Record the transaction history after failure
             dispatch(new RecordTransaction(getTransactionData($this->data)));
 
             throw $e;
@@ -75,6 +85,21 @@ class PurchaseAirtimeAction
     private function recordTransaction(): void
     {
         CreateTransactionAction::execute(getTransactionData($this->data));
+    }
+
+    private function canPurchaseAirtime(): bool
+    {
+        if ($this->wallet->balance < (float) $this->data['amount']) {
+            $this->data['status'] = Status::FAILED;
+            $this->data['notes'] = 'Insufficient balance';
+
+            // Record the transaction history after failure
+            dispatch(new RecordTransaction(getTransactionData($this->data)));
+
+            throw new IncompleteRequestException('Insufficient funds.');
+        }
+
+        return true;
     }
 
     private function setPayload(): void

@@ -28,6 +28,11 @@ class FundWalletAction
         $this->user = request()->user();
 
         throw_if(
+            !is_numeric($this->data['amount']),
+            new IncompleteRequestException('Invalid amount provided.')
+        );
+
+        throw_if(
             !$this->wallet = Wallet::where('user_id', $this->user->id)->first(),
             new ModelNotFoundException('User wallet not found.')
         );

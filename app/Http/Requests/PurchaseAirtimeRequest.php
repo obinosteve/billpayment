@@ -34,6 +34,12 @@ class PurchaseAirtimeRequest extends BaseRequest
             'phoneNumber.required' => 'No phone number provided',
             'phoneNumber.regex' => 'Phone number must be a valid number eg. 08067690774',
             'amount.required' => 'No amount provided',
+            'amount.numeric' => 'Invalid amount provided.',
         ];
+    }
+
+    public function prepareForValidation(): void
+    {
+        $this->merge(['amount' => str_replace(',', '', $this->amount)]);
     }
 }

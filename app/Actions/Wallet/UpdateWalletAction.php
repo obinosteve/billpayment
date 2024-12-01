@@ -10,6 +10,8 @@ class UpdateWalletAction
 
     public static function execute(Wallet $wallet): bool
     {
+        // If the wallet version has changed, then the update fails, 
+        // which means another update might have happened
         return DB::table('wallets')
             ->where('id', $wallet->id)
             ->where('version', $wallet->version)

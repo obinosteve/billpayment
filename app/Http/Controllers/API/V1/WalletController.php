@@ -26,6 +26,14 @@ class WalletController
 
     public function fundWallet(FundWalletRequest $request): ResponseSuccess|ResponseError
     {
+        // We assumed the following had been done:
+
+        // Setup payment processor
+        // Redirect user to the payment gateway to make payment
+        // Or listen for payment webhook
+        // verified user's payment
+        // Logged the payment transaction, if successful, then proceed
+
         try {
             (new FundWalletAction)->execute($request->all());
         } catch (Exception $e) {

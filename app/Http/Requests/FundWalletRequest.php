@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class FundWalletRequest extends FormRequest
+class FundWalletRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,7 +27,13 @@ class FundWalletRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'amount.required' => 'Please enter an amount greater than 5.',
+            'amount.required' => 'Please enter an amount greater than 5',
+            'amount.numeric' => 'Invalid amount provided.',
         ];
+    }
+
+    public function prepareForValidation(): void
+    {
+        $this->merge(['amount' => str_replace(',', '', $this->amount)]);
     }
 }

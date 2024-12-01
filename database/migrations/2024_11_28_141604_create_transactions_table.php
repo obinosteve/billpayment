@@ -18,10 +18,10 @@ return new class extends Migration
             $table->unsignedBigInteger('network_provider_id')->index()->nullable();
             $table->string('transaction_reference')->nullable();
             $table->decimal('amount', 15, 2);
-            $table->string('request_type'); // debit, credit
-            $table->string('transaction_type'); // airtime, fund_wallet
+            $table->string('request_type')->index(); // debit, credit
+            $table->string('transaction_type')->index(); // airtime, fund_wallet
             $table->timestamp('transaction_date');
-            $table->string('status'); // pending, approved, rejected, settled
+            $table->string('status')->index();
             $table->string('recipient')->nullable();
             $table->string('payment_method')->nullable(); // cash, card, bank transfer
             $table->string('payment_status')->nullable(); // successful, failed, pending, refunded
